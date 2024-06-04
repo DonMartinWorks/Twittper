@@ -43,7 +43,8 @@ class ChirpController extends Controller
         $validated = $request->validated();
         $request->user()->chirps()->create($validated);
 
-        return redirect(route('chirps.index'));
+        $message = __('New chirp posted successfully!');
+        return redirect(route('chirps.index'))->with('success', $message);
     }
 
     /**
@@ -79,14 +80,20 @@ class ChirpController extends Controller
 
         $chirp->update($validated);
 
-        return redirect(route('chirps.index'));
+        $message = __('Chirp updated successfully!');
+        return redirect(route('chirps.index'))->with('success', $message);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chirp $chirp)
+    public function destroy(Chirp $chirp): RedirectResponse
     {
-        //
+        Gate::authorize('delete', $chirp);
+
+        $chirp->delete();
+
+        $message = __('Chirp deleted successfully!');
+        return redirect(route('chirps.index'))->with('success', $message);
     }
 }
